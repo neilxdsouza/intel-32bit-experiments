@@ -42,8 +42,7 @@ I looked at at least the following projects when writing this
 
 ---------------------------------------------------
 Makefile Target: prinv1boot
-prin-v0.asm
-prin2-part2.asm
+Source Files: prin-v0.asm prin2-part2.asm
 Objective: Consolidate what has been developed above. 
 Print to the screen without using the BIOS int 10h. When we 
 switch to 32 bit mode we cannot use BIOS interrupts, so we need to write to
@@ -71,4 +70,28 @@ Caveat: The JOS initialisation routine takes care of monochrome as well as colou
    as the ports. 
 -------------------------------------------------------
 
+------------------------------------------------------
+Makefile Target: gas_boot
+Source Files: prin-v0.asm prin2-part2.gas
+Objective: Rewrite the same program as above, but in the GNU as
+format. The linux kernel uses this format
 
+Note: prin-v0.asm is still compiled with nasm, only prin2-part2.gas is compiled
+with as. 
+
+Learnings: 
+	1. (I think at least) You cannot create a binary file
+	   directly using as, instead you need to use the linker ld for that and give --oformat=binary
+	2. -Ttext = 0x0 sets the executable address for the program 
+	3. I am loading the program (2nd stage) at 0x10000, 
+	   so why does it work if the linker is told to generate code at 0x0 ? 
+	   Because the first few lines in my program load ax with cs address and
+	   then dumps that to all the segment registers. Hence all memory loads
+	   will be with respect to ds:mem_reference 
+	   = 0x1000 x 16 + mem_reference 
+	4. I should have mentioned this in the previous entry but notice the bug 
+	   corrected in scroll_screen. es and ds are both loaded with 0xb800 
+	   when scrolling the screen. Towards the end I want to update the
+	   cursor position. But the ds register still points to 0xb800. I have
+	   to load ds with 0x1000 and then do the mov [cursor_pos], di 
+------------------------------------------------------

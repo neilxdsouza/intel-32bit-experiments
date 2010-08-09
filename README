@@ -17,3 +17,24 @@ You can also use qemu.
 I run bochs this way:
 /usr/bochs2.3/bin/bochs -q 'boot:a' 'floppya: 1_44=floppy.img, status=inserted'
 
+-----------------------------------------------------------------
+prin-v0.asm
+prin-part2.asm
+Objective: prin-v0.asm is a 1st stage loader - it prints a message on the screen 
+and loads a 2nd program into memory(prin-part2.asm) and executes it.
+
+To understand how prin-v0.asm works you need to download Ralf Brown's interrupt list
+which documents almost all known BIOS interrupts, int 13h reads from a disk.
+
+prin-part2.asm contains certain routines like scroll_screen etc - but they 
+have not been debugged or tested yet. The make target for this pair of files is
+"prinv0boot"
+i.e. execute make prinv0boot and then (I) run this in the simulator as:
+/usr/bochs2.3/bin/bochs -q 'boot:a' 'floppya: 1_44=floppy.img, status=inserted'
+
+I looked at at least the following projects when writing this
+1. Daniel Majarmaki's nasmboot.txt
+2. JOS kernel boot.S which is used in an OS course by MIT, UCLA and Univ of Washington.
+   It seems to have the simplest jump to 32 bit mode
+3. www.brokenthorn.com - OS tutorial
+---------------------------------------------------------------

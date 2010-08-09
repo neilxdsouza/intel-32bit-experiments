@@ -38,3 +38,37 @@ I looked at at least the following projects when writing this
    It seems to have the simplest jump to 32 bit mode
 3. www.brokenthorn.com - OS tutorial
 ---------------------------------------------------------------
+
+
+---------------------------------------------------
+Makefile Target: prinv1boot
+prin-v0.asm
+prin2-part2.asm
+Objective: Consolidate what has been developed above. 
+Print to the screen without using the BIOS int 10h. When we 
+switch to 32 bit mode we cannot use BIOS interrupts, so we need to write to
+the video memory directly and update the cursor position ourselves.
+When writing to video memory I realised that bochs does not update the 
+screen if you do not update the cursor. Scroll the screen ourselves.
+
+My learnings in this :
+1. you cant mix int 10h and writing to video mem directly - 
+   int 10h seems to have its own internal location of where the cursor is
+   so if you write to video memory first and then use 10h to state that this
+   was successful, int 10h will overwrite your text string and you will not 
+   see it on screen.
+2. I got scroll_screen working on this and it was beautiful to see the 
+   rep movsw function work to scroll the screen.
+
+I studied the JOS code in console.c to understand how this is done. The JOS 
+   website suggests reading ibm-vga.txt. They use port 0x3d4 and 0x3d5 for 
+   the CRT control registers. This is documented in Ralf Brown's interrupt list
+   file PORTS.B. Reading that in conjuction with ibm-vga.txt will help one 
+   understand what is going on.
+
+Caveat: The JOS initialisation routine takes care of monochrome as well as colour
+   ports for video memory. My program assumes VGA and hardcodes 0xb8000 and 0x3d4
+   as the ports. 
+-------------------------------------------------------
+
+

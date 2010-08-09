@@ -95,3 +95,56 @@ Learnings:
 	   cursor position. But the ds register still points to 0xb800. I have
 	   to load ds with 0x1000 and then do the mov [cursor_pos], di 
 ------------------------------------------------------
+
+-----------------------------------------------------
+Makefile Target: gas_boot2
+Source Files: prin-v0.asm prin3-part2.S
+Objective: Transition into protected mode (32 bit mode)
+
+Learnings and a Log of what happened:
+	1. I first named the file prin3-part2.gas, and created by own gdt by
+	   hand. However when I tried to put it into 32 bit mode the program
+	   triple-faulted in bochs. The first mistake was I have forgotten to
+	   align it on a 4-byte boundary.
+	2. Hence I decided to use the JOS kernel segments - since that kernel
+	   boots up I know that it has to work. (Thats when I realised the
+	   alignment problem). I then went back to my program and re-enabled my
+	   gdt. It still didnt work. Further investigation revealed that
+	   Compiling for run address 0x00 and loading at 0x10000 was causing a
+	   problem.
+	3. There were other issues as well. 
+		i. First of all, All the functions
+	   which were in 16 bit mode had to be moved up ( above the .code32
+	   directive). Which is why you will notice I immediately do a 
+	   jump start2 at the top of the code - to skip over the functions that
+	   have been moved up. 
+	   	ii. There are other mistakes in the file as well. I forgot to
+		move cga_base_port and cursor_pos into the 16 bit code  in
+		the.gas file. This is corrected in the .S file.
+	4. To fix the problem for the link/load address I had to do many things.
+		i. replicate the JOS segments in my file. Thats when I realised
+		from the JOS makefile that they run gcc instead of "as" on the .S
+		file. The reason for this is documented in the as manual -
+		Naming the file .S and running gcc on it allows you to run the
+		C pre-processor. They have a very neat macro they use to setup the
+		segments - which I shamelessly copied. 
+		ii. ran objdump -S which disassembles the .o file. But this only
+		works on the elf binary not on the ld --oformat=binary file. At
+		least it didnt work for me even when I passed the architecture
+		to objdump. When I looked at the address of the gdt I realised
+		the link/load address problem. So i manually added 0x10000 to
+		the gdt address and stored it at gdtdesc. Once I got that
+		working, single stepping in bochs got me past the PE enable
+		point and I realised that the gdt table has been loaded
+		successfully. At that point i decided to change the load address
+		to 0x1000 - as it would make things a lot simpler. The long jump
+		into protected mode was giving address limitation warnings at
+		the link stage. I decided to abandon the file altogether. It is
+		included here because there were a lot of learnings from this
+		file.
+	5. I also tried to put the 32bit mode print routines in. However they
+	   were not debugged, since the code never really ran.
+	6. Also notice in the Makefile that I run an "ld" without oformat=binary
+	   first. Create the map using objdump and then re-run ld with
+	   oformat=binary
+-----------------------------------------------------

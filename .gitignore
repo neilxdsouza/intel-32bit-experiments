@@ -2,3 +2,6 @@
 *.map
 *.img
 *.o
+make_floppy
+*.bin_gas
+*.o_gas

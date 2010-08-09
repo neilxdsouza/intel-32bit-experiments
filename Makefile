@@ -1,3 +1,19 @@
+gas_boot2: prin-v0.bin prin3-part2.bin_gas
+	dd bs=512 conv=notrunc if=prin-v0.bin of=floppy.img 
+	dd bs=512 seek=1 conv=notrunc if=prin3-part2.bin_gas of=floppy.img 
+
+
+prin3-part2.bin_gas: prin3-part2.S
+	#as  -o prin3-part2.o_gas prin3-part2.gas
+	#ld -Ttext 0x0 --oformat binary -o prin3-part2.bin_gas  prin3-part2.o_gas
+	gcc -nostdinc -c -o prin3-part2.o $<
+	#ld -Ttext 0x0000 --oformat binary -o prin3-part2.bin_gas  prin3-part2.o
+	#ld -Ttext 0x1000 --oformat binary -o prin3-part2.bin_gas  prin3-part2.o
+	ld -N -e start -Tdata=0x10000 -Tbss=0x10000 -Ttext=0x10000 -o prin3-part2.bin_gas  prin3-part2.o
+	objdump -S prin3-part2.bin_gas > prin3-part2.dump
+	#ld -N -e start -Tdata=0x0000 -Tbss=0x0000 -Ttext=0x0000 -o prin3-part2.bin_gas  prin3-part2.o
+	#ld --oformat binary -Tdata=0x1000 -Tbss=0x1000 -Ttext=0x1000 -o prin3-part2.bin_gas  prin3-part2.o
+	ld --oformat binary -Tdata=0x10000 -Tbss=0x10000 -Ttext=0x10000 -o prin3-part2.bin_gas  prin3-part2.o
 
 gas_boot: prin-v0.bin prin2-part2.bin_gas
 	ld -Ttext 0x0 --oformat binary -o prin2-part2.bin_gas  prin2-part2.o_gas

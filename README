@@ -1,2 +1,19 @@
 This project is a list of my tinkering with the 32 bit i386 and above CPUs
 Each program is simple and builds on the previous one incrementally
+
+
+make_floppy.c: this file creates a floppy disk sized image. We will write our
+binary programs to this floppy and use an emulator to see the result.
+
+Emulators: bochs has excellent debugging support:
+The lines below marked by ---- are from the bochs manual. Refer to the chapter
+"Using the Bochs internal debugger"
+------------------
+To use the debugger, you must configure Bochs with the --enable-debugger and --enable-disasm flags. For example:
+  ./configure --enable-debugger --enable-disasm
+------------------
+You can also use qemu.
+
+I run bochs this way:
+/usr/bochs2.3/bin/bochs -q 'boot:a' 'floppya: 1_44=floppy.img, status=inserted'
+

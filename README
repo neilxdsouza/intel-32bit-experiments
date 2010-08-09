@@ -148,3 +148,25 @@ Learnings and a Log of what happened:
 	   first. Create the map using objdump and then re-run ld with
 	   oformat=binary
 -----------------------------------------------------
+
+--------------------------------------------------------
+Makefile Target: gas_boot3
+Source Files: prin-v1.asm prin4-part2.S
+Objective: Correct all the problems faced earlier,
+	change the load address to 0x1000 and 
+	Transition into protected mode (32 bit mode)
+Learnings and Notes:
+	A diff of prin4-part2.S and prin3-part2.S will hardly show much of a
+	difference. Because we are linking and loading at the same address, the
+	"as" computed gdt address works fine for lgdt. There are bug-fixes to the
+	32 bit print routines. 
+	The file prin-v1.asm loads the 2nd stage loader at 0x1000.
+	The program simple prints 32 bit on the screen. This message comes from
+	the 32 bit mode - We are in 32 bit mode at last. 
+	The assembly code to do the scrolling in protected is a lot easier than
+	in real mode. My assembly code, of course, is very in-efficient. The
+	scrolling can be done,I think, using base/index addressing rather than 
+	adding 0xb8000 to the registers. So the next exercise will be to make
+	this code more efficient and compact. After that we should use the old
+	gdt segments and solve any endianness problems which crop up. 
+--------------------------------------------------------

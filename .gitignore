@@ -5,3 +5,4 @@
 make_floppy
 *.bin_gas
 *.o_gas
+*.dump
